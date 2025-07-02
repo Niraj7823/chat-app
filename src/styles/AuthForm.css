@@ -2,23 +2,23 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
+  padding: 1rem;
   background-color: rgba(34, 127, 171, 0.523);
 }
 
 .auth-container {
-  width: 700px;
-  height: 400px;
   display: flex;
-  align-items: stretch; /* ✅ Ensures children take full height */
-  background-color: #ffffff;
+  flex-direction: row;
+  background-color: white;
   border-radius: 10px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  font-family: Arial, sans-serif;
+  height: 500px;
+  width: 90%;
+  max-width: 800px;
 }
 
-/* Left side */
 .auth-left {
   flex: 1;
   display: flex;
@@ -26,7 +26,12 @@
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  background-color: #ffffff; /* No blue background */
+  background-color: #ffffff;
+}
+.auth-left,
+.auth-right {
+  flex: 1;
+  padding: 2rem;
 }
 
 .auth-left h1 {
@@ -41,7 +46,6 @@
   color: #333;
 }
 
-/* Divider */
 .auth-divider {
   width: 4px;
   background-color: rgb(3, 122, 131);
@@ -50,7 +54,6 @@
   border-radius: 50%;
 }
 
-/* Right side */
 .auth-right {
   flex: 1;
   padding: 2rem;
@@ -93,4 +96,17 @@
 .auth-right p {
   text-align: center;
   margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .auth-container {
+    flex-direction: column;
+  }
+
+  .auth-divider {
+    width: 90%;
+    height: 4px;
+    align-self: center;
+    border-radius: 50%;
+  }
 }
