@@ -46,14 +46,6 @@
   color: #333;
 }
 
-.auth-divider {
-  width: 4px;
-  background-color: rgb(3, 122, 131);
-  height: 90%;
-  align-self: center;
-  border-radius: 50%;
-}
-
 .auth-right {
   flex: 1;
   padding: 2rem;
@@ -98,15 +90,25 @@
   margin-top: 10px;
 }
 
+.auth-divider {
+  width: 4px;
+  height: 90%;
+  background-color: rgb(3, 122, 131);
+  align-self: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
 @media (max-width: 768px) {
   .auth-container {
     flex-direction: column;
+    height: auto;
   }
 
   .auth-divider {
     width: 90%;
     height: 4px;
-    align-self: center;
+    margin: 1rem auto;
     border-radius: 50%;
   }
 }
