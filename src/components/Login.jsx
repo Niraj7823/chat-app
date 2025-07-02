@@ -2,6 +2,8 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import { BsChatText } from "react-icons/bs";
+
 import "../styles/AuthForm.css";
 
 export default function Login() {
@@ -24,7 +26,9 @@ export default function Login() {
     <div className="auth-wrapper">
       <div className="auth-container">
         <div className="auth-left">
-          <h1>💬 ChatVerse</h1>
+          <h1>
+            <BsChatText /> ChatVerse
+          </h1>
           <p>Welcome back to real-time conversation</p>
         </div>
 

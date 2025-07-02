@@ -3,6 +3,7 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import "../styles/AuthForm.css";
+import { BsChatText } from "react-icons/bs";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -37,7 +38,9 @@ export default function Signup() {
     <div className="auth-wrapper">
       <div className="auth-container">
         <div className="auth-left">
-          <h1>💬 ChatVerse</h1>
+          <h1>
+            <BsChatText /> ChatVerse
+          </h1>
           <p>Real-time chatting made simple</p>
         </div>
 
