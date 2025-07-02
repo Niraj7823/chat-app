@@ -1,0 +1,96 @@
+.auth-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: rgba(34, 127, 171, 0.523);
+}
+
+.auth-container {
+  width: 700px;
+  height: 400px;
+  display: flex;
+  align-items: stretch; /* ✅ Ensures children take full height */
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+/* Left side */
+.auth-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background-color: #ffffff; /* No blue background */
+}
+
+.auth-left h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: #146894;
+}
+
+.auth-left p {
+  font-size: 14px;
+  text-align: center;
+  color: #333;
+}
+
+/* Divider */
+.auth-divider {
+  width: 4px;
+  background-color: rgb(3, 122, 131);
+  height: 90%;
+  align-self: center;
+  border-radius: 50%;
+}
+
+/* Right side */
+.auth-right {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-right h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.auth-right input {
+  width: 90%;
+  padding: 12px;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.auth-right button {
+  width: 100%;
+  padding: 12px;
+  background-color: hsl(197, 83%, 30%);
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.auth-right button:hover {
+  background-color: #123555;
+}
+
+.auth-right p {
+  text-align: center;
+  margin-top: 10px;
+}

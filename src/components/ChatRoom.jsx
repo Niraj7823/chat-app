@@ -1,0 +1,108 @@
+import { useEffect, useRef, useState } from "react";
+import { auth, db } from "../firebase";
+import { BsChatText } from "react-icons/bs";
+
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+} from "firebase/firestore";
+import { signOut } from "firebase/auth";
+import { format } from "date-fns";
+import styles from "../styles/ChatRoom.module.css";
+
+export default function ChatRoom() {
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState("");
+  const messagesEndRef = useRef(null);
+  const user = auth.currentUser;
+
+  useEffect(() => {
+    const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMessages(msgs);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const handleSend = async (e) => {
+    e.preventDefault();
+    if (text.trim() === "") return;
+
+    try {
+      await addDoc(collection(db, "messages"), {
+        text,
+        createdAt: serverTimestamp(),
+        uid: user.uid,
+        name: user.displayName || user.email,
+      });
+      setText("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    window.location.href = "/login";
+  };
+
+  return (
+    <div className={styles.chatRoom}>
+      <header className={styles.header}>
+        <h2>
+          <BsChatText /> Chat Room
+        </h2>
+        <button onClick={handleLogout}>
+          <span>Logout</span>
+        </button>
+      </header>
+
+      <div className={styles.messages}>
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={
+              msg.uid === user.uid ? styles.sentWrapper : styles.receivedWrapper
+            }
+          >
+            <div
+              className={msg.uid === user.uid ? styles.sent : styles.received}
+            >
+              <p>{msg.text}</p>
+              <span className={styles.meta}>
+                {msg.name} •
+                {msg.createdAt?.seconds &&
+                  format(new Date(msg.createdAt.seconds * 1000), "p")}
+              </span>
+            </div>
+          </div>
+        ))}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      <form onSubmit={handleSend} className={styles.form}>
+        <input
+          type="text"
+          placeholder="Type your message..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  );
+}
