@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { auth, db } from "../firebase";
 import { BsChatText } from "react-icons/bs";
-
 import {
   addDoc,
   collection,
@@ -11,7 +10,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { signOut } from "firebase/auth";
-import { format } from "date-fns";
+import { format, isToday, isYesterday } from "date-fns";
 import styles from "../styles/ChatRoom.module.css";
 
 export default function ChatRoom() {
@@ -20,6 +19,7 @@ export default function ChatRoom() {
   const messagesEndRef = useRef(null);
   const user = auth.currentUser;
 
+  // Real-time message listener
   useEffect(() => {
     const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -33,10 +33,12 @@ export default function ChatRoom() {
     return () => unsubscribe();
   }, []);
 
+  // Auto-scroll to bottom on new message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Send message
   const handleSend = async (e) => {
     e.preventDefault();
     if (text.trim() === "") return;
@@ -54,9 +56,17 @@ export default function ChatRoom() {
     }
   };
 
+  // Logout
   const handleLogout = async () => {
     await signOut(auth);
     window.location.href = "/login";
+  };
+
+  // Get label like Today, Yesterday, or date
+  const getDayLabel = (date) => {
+    if (isToday(date)) return "Today";
+    if (isYesterday(date)) return "Yesterday";
+    return format(date, "MMMM d, yyyy"); // e.g., July 3, 2025
   };
 
   return (
@@ -71,26 +81,51 @@ export default function ChatRoom() {
       </header>
 
       <div className={styles.messages}>
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={
-              msg.uid === user.uid ? styles.sentWrapper : styles.receivedWrapper
-            }
-          >
-            <div
-              className={msg.uid === user.uid ? styles.sent : styles.received}
-            >
-              <p>{msg.text}</p>
-              <span className={styles.meta}>
-                {msg.name} •
-                {msg.createdAt?.seconds &&
-                  format(new Date(msg.createdAt.seconds * 1000), "p")}
-              </span>
-            </div>
-          </div>
-        ))}
+        {(() => {
+          let lastDateLabel = null;
 
+          return messages.map((msg, index) => {
+            const createdAt = msg.createdAt?.seconds
+              ? new Date(msg.createdAt.seconds * 1000)
+              : null;
+
+            const currentLabel = createdAt ? getDayLabel(createdAt) : null;
+            const showDateHeader =
+              currentLabel && currentLabel !== lastDateLabel;
+
+            if (showDateHeader) {
+              lastDateLabel = currentLabel;
+            }
+
+            return (
+              <div key={msg.id}>
+                {showDateHeader && (
+                  <div className={styles.daySeparator}>
+                    <span>{currentLabel}</span>
+                  </div>
+                )}
+                <div
+                  className={
+                    msg.uid === user.uid
+                      ? styles.sentWrapper
+                      : styles.receivedWrapper
+                  }
+                >
+                  <div
+                    className={
+                      msg.uid === user.uid ? styles.sent : styles.received
+                    }
+                  >
+                    <p>{msg.text}</p>
+                    <span className={styles.meta}>
+                      {msg.name} • {createdAt && format(createdAt, "p")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          });
+        })()}
         <div ref={messagesEndRef} />
       </div>
 
