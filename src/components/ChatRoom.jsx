@@ -19,7 +19,6 @@ export default function ChatRoom() {
   const messagesEndRef = useRef(null);
   const user = auth.currentUser;
 
-  // Real-time message listener
   useEffect(() => {
     const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -33,12 +32,10 @@ export default function ChatRoom() {
     return () => unsubscribe();
   }, []);
 
-  // Auto-scroll to bottom on new message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Send message
   const handleSend = async (e) => {
     e.preventDefault();
     if (text.trim() === "") return;
@@ -56,17 +53,15 @@ export default function ChatRoom() {
     }
   };
 
-  // Logout
   const handleLogout = async () => {
     await signOut(auth);
     window.location.href = "/login";
   };
 
-  // Get label like Today, Yesterday, or date
   const getDayLabel = (date) => {
     if (isToday(date)) return "Today";
     if (isYesterday(date)) return "Yesterday";
-    return format(date, "MMMM d, yyyy"); // e.g., July 3, 2025
+    return format(date, "MMMM d, yyyy");
   };
 
   return (
