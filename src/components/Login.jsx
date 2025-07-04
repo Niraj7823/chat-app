@@ -53,7 +53,7 @@ export default function Login() {
           </form>
           <p>
             Don’t have an account?{" "}
-            <button onClick={() => navigate("/")}>Go to Signup</button>
+            <button onClick={() => navigate("/signup")}>Go to Signup</button>
           </p>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { BsChatText } from "react-icons/bs";
 import { MdDelete } from "react-icons/md";
 import { FaReply } from "react-icons/fa6";
 import { MdContentCopy } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 const CONTEXT_MENU_WIDTH = 160;
 const CONTEXT_MENU_HEIGHT = 130;
 
@@ -108,9 +109,11 @@ export default function ChatRoom() {
     }
   };
 
+  const navigate = useNavigate();
+
   const handleLogout = async () => {
     await signOut(auth);
-    window.location.href = "/login";
+    navigate("/");
   };
 
   const getDayLabel = (date) => {
