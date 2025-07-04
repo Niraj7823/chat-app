@@ -256,6 +256,8 @@
   padding: 8px 0;
   z-index: 9999;
   width: 150px;
+  max-width: 160px;
+  word-wrap: break-word;
   font-size: 14px;
 }
 

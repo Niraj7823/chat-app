@@ -4,6 +4,9 @@ import { BsChatText } from "react-icons/bs";
 import { MdDelete } from "react-icons/md";
 import { FaReply } from "react-icons/fa6";
 import { MdContentCopy } from "react-icons/md";
+const CONTEXT_MENU_WIDTH = 160;
+const CONTEXT_MENU_HEIGHT = 130;
+
 import {
   addDoc,
   collection,
@@ -21,6 +24,7 @@ import styles from "../styles/ChatRoom.module.css";
 export default function ChatRoom() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
+  const chatContainerRef = useRef(null);
   const [replyTo, setReplyTo] = useState(null);
   const [contextMenu, setContextMenu] = useState({
     visible: false,
@@ -47,6 +51,24 @@ export default function ChatRoom() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (contextMenu.visible) {
+        setContextMenu({ ...contextMenu, visible: false });
+      }
+    };
+
+    const chatEl = chatContainerRef.current;
+    if (chatEl) {
+      chatEl.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (chatEl) {
+        chatEl.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [contextMenu]);
 
   useEffect(() => {
     const handleClickOutside = () => {
@@ -108,7 +130,7 @@ export default function ChatRoom() {
         </button>
       </header>
 
-      <div className={styles.messages}>
+      <div className={styles.messages} ref={chatContainerRef}>
         {(() => {
           let lastDateLabel = null;
 
@@ -146,10 +168,20 @@ export default function ChatRoom() {
                     onContextMenu={(e) => {
                       if (msg.isDeleted) return;
                       e.preventDefault();
+                      const x =
+                        e.pageX + CONTEXT_MENU_WIDTH > window.innerWidth
+                          ? window.innerWidth - CONTEXT_MENU_WIDTH - 10
+                          : e.pageX;
+
+                      const y =
+                        e.pageY + CONTEXT_MENU_HEIGHT > window.innerHeight
+                          ? window.innerHeight - CONTEXT_MENU_HEIGHT - 10
+                          : e.pageY;
+
                       setContextMenu({
                         visible: true,
-                        x: e.pageX,
-                        y: e.pageY,
+                        x,
+                        y,
                         message: msg,
                       });
                     }}
@@ -157,10 +189,20 @@ export default function ChatRoom() {
                       if (msg.isDeleted) return;
                       const touch = e.touches[0];
                       msg._pressTimer = setTimeout(() => {
+                        const x =
+                          touch.pageX + CONTEXT_MENU_WIDTH > window.innerWidth
+                            ? window.innerWidth - CONTEXT_MENU_WIDTH - 10
+                            : touch.pageX;
+
+                        const y =
+                          touch.pageY + CONTEXT_MENU_HEIGHT > window.innerHeight
+                            ? window.innerHeight - CONTEXT_MENU_HEIGHT - 10
+                            : touch.pageY;
+
                         setContextMenu({
                           visible: true,
-                          x: touch.pageX,
-                          y: touch.pageY,
+                          x,
+                          y,
                           message: msg,
                         });
                       }, 600);
