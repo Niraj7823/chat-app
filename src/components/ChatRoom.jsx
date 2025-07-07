@@ -5,6 +5,7 @@ import { MdDelete } from "react-icons/md";
 import { FaReply } from "react-icons/fa6";
 import { MdContentCopy } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import MembersPanel from "./MembersPanel";
 const CONTEXT_MENU_WIDTH = 160;
 const CONTEXT_MENU_HEIGHT = 130;
 
@@ -27,6 +28,9 @@ export default function ChatRoom() {
   const [text, setText] = useState("");
   const chatContainerRef = useRef(null);
   const [replyTo, setReplyTo] = useState(null);
+  const [showMembers, setShowMembers] = useState(false);
+  const membersPanelRef = useRef(null);
+  const inputRef = useRef(null);
   const [contextMenu, setContextMenu] = useState({
     visible: false,
     x: 0,
@@ -48,6 +52,26 @@ export default function ChatRoom() {
     });
     return () => unsubscribe();
   }, []);
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        membersPanelRef.current &&
+        !membersPanelRef.current.contains(e.target) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target)
+      ) {
+        setShowMembers(false);
+      }
+    };
+
+    if (showMembers) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showMembers]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -126,7 +150,10 @@ export default function ChatRoom() {
     <div className={styles.chatRoom}>
       <header className={styles.header}>
         <h2>
-          <BsChatText /> Chat Room
+          <BsChatText />{" "}
+          <button onClick={() => setShowMembers(true)}>
+            <span>Chat Room</span>{" "}
+          </button>
         </h2>
         <button onClick={handleLogout}>
           <span>Logout</span>
@@ -296,12 +323,18 @@ export default function ChatRoom() {
       <form onSubmit={handleSend} className={styles.form}>
         <input
           type="text"
+          ref={inputRef}
           placeholder="Type your message..."
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
         <button type="submit">Send</button>
       </form>
+      {showMembers && (
+        <div ref={membersPanelRef}>
+          <MembersPanel onClose={() => setShowMembers(false)} />
+        </div>
+      )}
     </div>
   );
 }

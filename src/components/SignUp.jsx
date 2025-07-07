@@ -4,6 +4,8 @@ import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import "../styles/AuthForm.css";
 import { BsChatText } from "react-icons/bs";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -19,6 +21,13 @@ export default function Signup() {
         email.trim(),
         password
       );
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        uid: userCredential.user.uid,
+        name,
+        email,
+        photoURL: userCredential.user.photoURL || null,
+        status: "Available",
+      });
 
       await updateProfile(userCredential.user, {
         displayName: name,
