@@ -3,6 +3,7 @@ import Signup from "./components/SignUp";
 import Login from "./components/Login";
 import ChatRoom from "./components/ChatRoom";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PersonalChat from "./components/PersonalChat";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/chat/:uid" element={<PersonalChat />} />
     </Routes>
   );
 }

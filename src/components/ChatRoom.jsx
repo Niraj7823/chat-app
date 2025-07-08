@@ -31,6 +31,7 @@ export default function ChatRoom() {
   const [showMembers, setShowMembers] = useState(false);
   const membersPanelRef = useRef(null);
   const inputRef = useRef(null);
+  const [allUsers, setAllUsers] = useState([]);
   const [contextMenu, setContextMenu] = useState({
     visible: false,
     x: 0,
@@ -50,6 +51,17 @@ export default function ChatRoom() {
       }));
       setMessages(msgs);
     });
+    return () => unsubscribe();
+  }, []);
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+      const users = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAllUsers(users);
+    });
+
     return () => unsubscribe();
   }, []);
   useEffect(() => {
@@ -330,9 +342,13 @@ export default function ChatRoom() {
         />
         <button type="submit">Send</button>
       </form>
+
       {showMembers && (
         <div ref={membersPanelRef}>
-          <MembersPanel onClose={() => setShowMembers(false)} />
+          <MembersPanel
+            onClose={() => setShowMembers(false)}
+            members={allUsers} // ✅ Pass the users here
+          />
         </div>
       )}
     </div>
