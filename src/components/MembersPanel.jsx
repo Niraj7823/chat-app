@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+} from "firebase/firestore";
 import { auth, db } from "../firebase";
 import styles from "../styles/MembersPanel.module.css";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +15,7 @@ export default function MembersPanel({ onClose }) {
   const user = auth.currentUser;
   const panelRef = useRef(null);
   const navigate = useNavigate();
+  const [unreadCounts, setUnreadCounts] = useState({});
   const [contextMenu, setContextMenu] = useState({
     visible: false,
     x: 0,
@@ -16,7 +23,6 @@ export default function MembersPanel({ onClose }) {
     user: null,
   });
 
-  // Fetch all users from Firestore
   useEffect(() => {
     const fetchUsers = async () => {
       const querySnapshot = await getDocs(collection(db, "users"));
@@ -29,7 +35,50 @@ export default function MembersPanel({ onClose }) {
     fetchUsers();
   }, []);
 
-  // Handle click outside to close panel and context menu
+  useEffect(() => {
+    const unsubscribes = [];
+
+    members.forEach((member) => {
+      if (member.id === user.uid) return;
+
+      const chatId =
+        user.uid < member.id
+          ? `${user.uid}_${member.id}`
+          : `${member.id}_${user.uid}`;
+
+      const unsubscribe = onSnapshot(
+        collection(db, "privateChats", chatId, "messages"),
+        async (snap) => {
+          let count = 0;
+
+          const readDoc = await getDoc(
+            doc(db, "privateChats", chatId, "metadata", user.uid)
+          );
+          const lastRead = readDoc.exists()
+            ? readDoc.data()?.lastRead?.seconds || 0
+            : 0;
+
+          snap.docs.forEach((d) => {
+            const msg = d.data();
+            const createdAt = msg.createdAt?.seconds || 0;
+            if (msg.senderId !== user.uid && createdAt > lastRead) {
+              count++;
+            }
+          });
+
+          setUnreadCounts((prev) => ({
+            ...prev,
+            [member.id]: count,
+          }));
+        }
+      );
+
+      unsubscribes.push(unsubscribe);
+    });
+
+    return () => unsubscribes.forEach((unsub) => unsub());
+  }, [members]);
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -87,7 +136,7 @@ export default function MembersPanel({ onClose }) {
         <input placeholder="Search members" className={styles.search} />
 
         <ul className={styles.memberList}>
-          {(members || []).map((member) => (
+          {members.map((member) => (
             <li
               key={member.id}
               className={styles.memberItem}
@@ -105,13 +154,19 @@ export default function MembersPanel({ onClose }) {
               />
               <div>
                 <strong>{member.id === user.uid ? "You" : member.name}</strong>
+
+                {unreadCounts[member.id] > 0 && (
+                  <span className={styles.unreadBadge}>
+                    {unreadCounts[member.id]}
+                  </span>
+                )}
+
                 <p className={styles.status}>{member.status || "Online"}</p>
               </div>
             </li>
           ))}
         </ul>
 
-        {/* 👇 Move context menu INSIDE panel so clicks don't close it */}
         {contextMenu.visible && (
           <ul
             className={styles.contextMenu}
@@ -125,7 +180,7 @@ export default function MembersPanel({ onClose }) {
               className={styles.hoverEffect}
               onClick={() => handleStartPersonalChat(contextMenu.user)}
             >
-              💬 Personal Chat
+              Personal Chat
             </li>
           </ul>
         )}

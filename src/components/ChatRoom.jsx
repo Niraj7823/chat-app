@@ -22,7 +22,6 @@ import {
 import { signOut } from "firebase/auth";
 import { format, isToday, isYesterday } from "date-fns";
 import styles from "../styles/ChatRoom.module.css";
-
 export default function ChatRoom() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
@@ -176,7 +175,7 @@ export default function ChatRoom() {
         {(() => {
           let lastDateLabel = null;
 
-          return messages.map((msg, index) => {
+          return messages.map((msg) => {
             const createdAt = msg.createdAt?.seconds
               ? new Date(msg.createdAt.seconds * 1000)
               : null;
@@ -347,7 +346,7 @@ export default function ChatRoom() {
         <div ref={membersPanelRef}>
           <MembersPanel
             onClose={() => setShowMembers(false)}
-            members={allUsers} // ✅ Pass the users here
+            members={allUsers}
           />
         </div>
       )}

@@ -278,14 +278,22 @@
 .backButton {
   margin-right: 1rem;
   padding: 6px 12px;
-  background-color: #f0f0f0;
   border: none;
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
   transition: background 0.3s ease;
 }
-
-.backButton:hover {
-  background-color: #ddd;
+.daySeparator {
+  text-align: center;
+  margin: 10px 0;
+  color: #888;
+  font-size: 14px;
+}
+.meta {
+  display: block;
+  font-size: 12px;
+  color: #838383;
+  margin-top: 4px;
+  text-align: right;
 }
